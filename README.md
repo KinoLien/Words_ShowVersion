@@ -1,8 +1,8 @@
 
-##### This project requires the following **Modules**:
+##### This project requires the following modules:
 - [TiWS](https://marketplace.appcelerator.com/apps/3158)
-- [Android](Canvas https://marketplace.appcelerator.com/apps/5941)
-
+- [Android Canvas](https://marketplace.appcelerator.com/apps/5941)
+- RoR Server in socket format
 
 ----------------------------------
 Stuff our legal folk make us say:
