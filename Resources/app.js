@@ -21,7 +21,7 @@ Object.prototype.combine = function(o){
 
 // requires
 var Canvas = require('com.wwl.canvas');
-var TiWS = require("net.iamyellow.tiws");
+// var TiWS = require("net.iamyellow.tiws");
 
 // condition variables
 var isAndroid = Titanium.Platform.name == 'android';

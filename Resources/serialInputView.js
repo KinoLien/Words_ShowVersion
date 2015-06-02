@@ -288,7 +288,8 @@ var serialInputViewInit = function(){
 		
 		triggerObj.user_id = socketUser;
 		// open socket to server
-		socketObj = new WebSocketRails(wsIpAddress);
+		// socketObj = new WebSocketRails(wsIpAddress);
+		socketObj = new WebSocketNodeJS(wsIpAddress);
 		socketObj.on_open = function(e){
 			//Ti.API.info('Socket opened');
 			getGameInfoRequest({
