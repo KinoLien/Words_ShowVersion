@@ -395,7 +395,7 @@ var io = ('undefined' === typeof module ? {} : module.exports);
     }
 
     return ret;
-  }
+  };
 
   /**
    * Array indexOf compatibility.
@@ -1067,7 +1067,7 @@ var io = ('undefined' === typeof module ? {} : module.exports);
   Transport.prototype.onConnect = function () {
     this.socket.onConnect();
     return this;
-  }
+  };
 
   /**
    * Clears close timeout
@@ -2034,7 +2034,7 @@ var io = ('undefined' === typeof module ? {} : module.exports);
   WS.prototype.open = function () {
     var query = io.util.query(this.socket.options.query)
       , self = this
-      , Socket
+      , Socket;
 
     this.websocket = require('net.iamyellow.tiws').createWS();    
 
