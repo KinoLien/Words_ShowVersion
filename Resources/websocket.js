@@ -20,6 +20,7 @@ NodeJS JavaScript Client
 	
 	WebSocketNodeJS.prototype.connect = function(){
 		var io = require('socket.io');
+		Ti.API.log("In WebsocketNodeJS: "+this.uri);
 		this.socket = io.connect(this.uri);
 		
 		var connectHandler = (function(ins){
@@ -31,17 +32,16 @@ NodeJS JavaScript Client
 		})(this);
 		
 		this.socket.on('connect', connectHandler);
-		
-		// this.socket.on('connect', this.on_open);
+
 		return this;
 	};
 	
 	WebSocketNodeJS.prototype.disconnect = function(){
+		this.state = 'disconnected';
 		if(this.socket){
 			this.socket.disconnect();
 			this.disconnectHandler();
 		}
-		this.state = 'disconnected';
 		return this;
 	};
 	

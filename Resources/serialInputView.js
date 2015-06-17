@@ -283,13 +283,14 @@ var serialInputViewInit = function(){
 		socketUser = serialField.getValue();
 		socketIpAddress = ipField.getValue();
 		
-		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "/websocket?client_id=" + socketUser;
+		// var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "/websocket?client_id=" + socketUser;
+		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "?_rtUserId=" + socketUser;
 		//socketPortNumber = parseInt(portField.getValue());
 		
 		triggerObj.user_id = socketUser;
 		// open socket to server
 		// socketObj = new WebSocketRails(wsIpAddress);
-		socketObj = new WebSocketNodeJS(wsIpAddress);
+		socketObj = new WebSocketNodeJS("http://"+wsIpAddress);
 		socketObj.on_open = function(e){
 			//Ti.API.info('Socket opened');
 			getGameInfoRequest({
@@ -312,7 +313,9 @@ var serialInputViewInit = function(){
 			});
 			socketObj.bind(RESET_EVENT, resetCallback);
 		};
-		socketObj.disconnectHandler = function(){ clearConnectionInfo(); };
+		socketObj.disconnectHandler = function(){
+			clearConnectionInfo();
+		};
 		socketObj.connect();
 		watingTimeOut = setTimeout(function(){
 			clearInterval(serialInputWindow.maskInterval);

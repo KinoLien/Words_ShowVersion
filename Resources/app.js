@@ -54,7 +54,8 @@ var lastY = 0;
 var testMode = false;
 var socketUser = '1';
 var socketIpAddress = '192.168.0.118';
-var socketPortNumber = '3000';
+var socketPortNumber = '5001';
+var railsPortNumber = '3000';
 var preWindowStack = [];
 var triggerObj = {};
 var stampFilter = 16;
@@ -152,7 +153,7 @@ var getGameInfoRequest = function(handlers){
 		successHandler: function(){},
 		errorHandler: function(){}
 	}.combine(handlers);
-	var gameInfoUrl = "http://" + socketIpAddress + ":" + socketPortNumber + 
+	var gameInfoUrl = "http://" + socketIpAddress + ":" + railsPortNumber + 
 		"/games/get_game_data.json?id=" + socketUser;
 	var client = Ti.Network.createHTTPClient({
 		onload: function(e) {
