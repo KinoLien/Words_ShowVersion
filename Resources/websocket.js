@@ -21,7 +21,7 @@ NodeJS JavaScript Client
 	WebSocketNodeJS.prototype.connect = function(){
 		var io = require('socket.io');
 		Ti.API.log("In WebsocketNodeJS: "+this.uri);
-		this.socket = io.connect(this.uri);
+		this.socket = io.connect(this.uri, {forceNew:true});
 		
 		var connectHandler = (function(ins){
 			return function(){
@@ -37,9 +37,9 @@ NodeJS JavaScript Client
 	};
 	
 	WebSocketNodeJS.prototype.disconnect = function(){
-		this.state = 'disconnected';
 		if(this.socket){
 			this.socket.disconnect();
+			this.state = 'disconnected';
 			this.disconnectHandler();
 		}
 		return this;

@@ -268,6 +268,7 @@ var prepareStage = function(stage){
 			currentWindow.refreshCountAfterStop = toRefresh;
 			currentWindow.passedMessage = passedMsg;
 			currentWindow.addEventListener('open', function(){
+				currentWindow.activity.actionBar.hide();
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
 					socketObj.bind(ACTION_EVENT, runningActionCallback());
@@ -288,6 +289,7 @@ var prepareStage = function(stage){
 			});
 			currentWindow.refreshCountAfterStop = toRefresh;
 			currentWindow.addEventListener('open', function(){
+				currentWindow.activity.actionBar.hide();
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
 					socketObj.bind(ACTION_EVENT, wrongActionCallback());
@@ -307,6 +309,7 @@ var prepareStage = function(stage){
 			});
 			currentWindow.refreshCountAfterStop = toRefresh;
 			currentWindow.addEventListener('open', function(e){
+				currentWindow.activity.actionBar.hide();
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
 					socketObj.bind(ACTION_EVENT, idiomsActionCallback());
