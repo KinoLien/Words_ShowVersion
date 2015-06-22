@@ -422,7 +422,7 @@ var drawPointToCanvas = function(protocolPointArray, target, scale){
 	}
 };
 
-Ti.include('websocket.js');
+Ti.include('websocketrails.js');
 Ti.include('layout.js');
 Ti.include('serialInputView.js');
 Ti.include('idiomsView.js');
