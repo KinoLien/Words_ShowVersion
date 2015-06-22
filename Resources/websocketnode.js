@@ -13,6 +13,39 @@ NodeJS JavaScript Client
 		this.on_open = function(){};
 		this.disconnectHandler = function(){};
 		this.uri = uri;
+		this._state = null;
+		Object.defineProperty(this, 'state', {
+	    	get: function(){
+	    		return this._state;
+	    	},
+		    set: function(v) {
+		    	var oldState = this._state; 
+		    	this._state = v;
+		    	if(oldState == 'connected' && v == 'disconnected'){
+		    		var disMsg = Titanium.UI.createAlertDialog({
+				        title : 'Alert',
+				        message : '與伺服器連線中斷！',
+				        buttonNames : ['確定']
+				    });
+				 
+					disMsg.addEventListener('click', (function(){
+						var scope = this;
+						return function(e) {
+					        if(e.index == 0) {
+					    		setTimeout((function(){
+					    			var s = this;
+					    			return function(){
+					    				if(s.disconnectHandler) s.disconnectHandler();
+					    			};
+					    		}).call(scope),10);
+					        }
+					    };
+					}).call(this));
+				    disMsg.show();
+		    	}
+			}
+		});
+		
 		if(autoConnect === true){
 			this.connect();
 		}

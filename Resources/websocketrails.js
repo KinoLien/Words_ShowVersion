@@ -23,7 +23,7 @@ Stop listening for new events from the server
 
 this.WebSocketRails = (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  
+  var TiWS = require("net.iamyellow.tiws");
   function WebSocketRails(url/*, use_websockets */) {
     this.url = url;
     //this.use_websockets = use_websockets !== true ? use_websockets : true;

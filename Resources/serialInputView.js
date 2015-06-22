@@ -185,6 +185,21 @@ var serialInputViewInit = function(){
 		}
 	});
 	
+	var mulitTestButton = Ti.UI.createButton({
+		color: '#fff',
+		backgroundColor:'#ff3333',
+		opacity:0.5,
+		top: initPosition.gapUnitSize * 13.2 + 'px',
+		width: initPosition.gapUnitSize * 5 + 'px',
+		height: initPosition.gapUnitSize * 1.4 + 'px',
+		title:'多人Test',
+		borderRadius:3,
+		font:{
+			fontSize: initPosition.fontSize * 0.8 + 'px',
+			fontFamily: 'Helvetica Neue'
+		}
+	});
+	
 	var testRegionLabel = Titanium.UI.createLabel({
 		color:'#999',
 		top: initPosition.gapUnitSize * 15 + 'px',
@@ -283,13 +298,69 @@ var serialInputViewInit = function(){
 		socketUser = serialField.getValue();
 		socketIpAddress = ipField.getValue();
 		
-		// var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "/websocket?client_id=" + socketUser;
-		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "?_rtUserId=" + socketUser;
+		var wsIpAddress = socketIpAddress + ":" + railsPortNumber + "/websocket?client_id=" + socketUser;
+		
 		//socketPortNumber = parseInt(portField.getValue());
 		
 		triggerObj.user_id = socketUser;
 		// open socket to server
-		// socketObj = new WebSocketRails(wsIpAddress);
+		
+		socketObj = new WebSocketRails(wsIpAddress);
+		
+		socketObj.on_open = function(e){
+			//Ti.API.info('Socket opened');
+			getGameInfoRequest({
+				onsendHandler: function(){
+					//clearTimeout(watingTimeOut);
+					serialMaskLabel.statusText = "正在取得遊戲資訊";
+				},
+				successHandler: function(info){
+					clearTimeout(watingTimeOut);
+					serialMaskLabel.statusText = "正在開啟";
+					prepareStage(info.stage);
+					serialMaskLabel.statusText = "";
+				},
+				errorHandler: function(info){
+					clearTimeout(watingTimeOut);
+					alert(serialMaskLabel.statusText + ' Error, info: ' + JSON.stringify(gameInfo));
+					clearConnectionInfo();
+					if(currentMask) currentMask.hide();
+				}
+			});
+			socketObj.bind(RESET_EVENT, resetCallback);
+		};
+		socketObj.disconnectHandler = function(){
+			clearConnectionInfo();
+		};
+		socketObj.connect();
+		watingTimeOut = setTimeout(function(){
+			clearInterval(serialInputWindow.maskInterval);
+			alert('ERROR: 連線逾時！');
+			serialMaskView.hide();
+			clearConnectionInfo();
+		}, 4500);
+	});
+	
+	mulitTestButton.addEventListener('click', function(){
+		// Cache the code to globel variable and turn to run window
+		testMode = false;
+		serialMaskLabel.statusText = "連線中";
+		
+		serialInputWindow.maskInterval = setInterval(genMaskInterval(serialMaskLabel), 300);
+		
+		serialMaskView.show();
+		
+		// cache information
+		socketUser = serialField.getValue();
+		socketIpAddress = ipField.getValue();
+		
+		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "?_rtUserId=" + socketUser;
+		
+		//socketPortNumber = parseInt(portField.getValue());
+		
+		triggerObj.user_id = socketUser;
+		// open socket to server
+		
 		socketObj = new WebSocketNodeJS("http://"+wsIpAddress);
 		socketObj.on_open = function(e){
 			//Ti.API.info('Socket opened');
@@ -390,6 +461,7 @@ var serialInputViewInit = function(){
 	serialInputWindow.add(ipField);
 	//serialInputWindow.add(portField);
 	serialInputWindow.add(submitButton);
+	serialInputWindow.add(mulitTestButton);
 	serialInputWindow.add(testRegionLabel);
 	serialInputWindow.add(testButton);
 	serialInputWindow.add(wrongTestButton);
