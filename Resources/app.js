@@ -23,6 +23,39 @@ Object.prototype.combine = function(o){
 var Canvas = require('com.wwl.canvas');
 // var TiWS = require("net.iamyellow.tiws");
 
+Canvas.createCanvasView = (function(oldCreate){
+	return function(o){
+		var res = oldCreate.call(this, o);
+		res.hasTrack = false;
+		// drawPoint stroke
+		var oldDrawPoint = res.drawPoint;
+		var oldStroke = res.stroke;
+		var oldClear = res.clear;
+		
+		res.drawPoint = (function(oldFn){
+			return function(){
+				oldFn.apply(this, arguments);
+				this.hasTrack = true;
+			};
+		})(oldDrawPoint);
+		
+		res.stroke = (function(oldFn){
+			return function(){
+				oldFn.call(this);
+				this.hasTrack = true;
+			};
+		})(oldStroke);
+		
+		res.clear = (function(oldFn){
+			return function(){
+				oldFn.call(this);
+				this.hasTrack = false;
+			};
+		})(oldClear);
+		return res;
+	};
+})(Canvas.createCanvasView);
+
 // condition variables
 var isAndroid = Titanium.Platform.name == 'android';
 
@@ -269,6 +302,7 @@ var prepareStage = function(stage){
 			currentWindow.passedMessage = passedMsg;
 			currentWindow.addEventListener('open', function(){
 				currentWindow.activity.actionBar.hide();
+				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
 					socketObj.bind(ACTION_EVENT, runningActionCallback());
@@ -290,6 +324,7 @@ var prepareStage = function(stage){
 			currentWindow.refreshCountAfterStop = toRefresh;
 			currentWindow.addEventListener('open', function(){
 				currentWindow.activity.actionBar.hide();
+				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
 					socketObj.bind(ACTION_EVENT, wrongActionCallback());
@@ -310,6 +345,7 @@ var prepareStage = function(stage){
 			currentWindow.refreshCountAfterStop = toRefresh;
 			currentWindow.addEventListener('open', function(e){
 				currentWindow.activity.actionBar.hide();
+				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
 					socketObj.bind(ACTION_EVENT, idiomsActionCallback());
@@ -332,10 +368,14 @@ var prepareStage = function(stage){
 			break;
 		default:
 			break;
+		
 	}
 };
 
 var deprecateStage = function(stageName){
+	if(currentWindow){
+		currentWindow.activity.removeEventListener("pause", pauseEventHandler);	
+	}
 	switch (stageName){
 		case "A1":
 		case "A2":
@@ -426,6 +466,13 @@ var drawPointToCanvas = function(protocolPointArray, target, scale){
 	}
 };
 
+var pauseEventHandler = function(){
+	Ti.API.log('paused');
+	if(currentWindow){
+		if(currentWindow.countdownInterval) clearInterval(currentWindow.countdownInterval);
+    	clearConnectionInfo();	
+	}
+};
 
 Ti.include('websocketrails.js');
 Ti.include('websocketnode.js');

@@ -25,7 +25,8 @@ var idiomsTriggerDeviceAction = function(name){
 					column: idiomsCurrentCol
 				},
 				stamp: (new Date()).getTime(),
-				action: "device_" + name
+				action: "device_" + name,
+				hasTrack: idiomsShortCanvasArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1].hasTrack === true
 				//cid: socketUser
 			}
 		);

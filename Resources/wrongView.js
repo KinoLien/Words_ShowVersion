@@ -37,7 +37,8 @@ var wrongTriggerDeviceAction = function(name){
 					column: wrongCurrentCol
 				},
 				stamp: (new Date()).getTime(),
-				action: "device_" + name
+				action: "device_" + name,
+				hasTrack: wrongShortCanvasArray[wrongCurrentRow - 1][wrongCurrentCol - 1].hasTrack === true
 				// ,
 				// cid: socketUser + "_" + wrongCurrentRow + "_" + wrongCurrentCol
 			}

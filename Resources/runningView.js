@@ -12,6 +12,7 @@ var runningDeviceAction = function(name){
 				user_id: socketUser,
 				stamp: (new Date()).getTime(),
 				action: "device_" + name,
+				hasTrack: currentWindow.innerCanvas.hasTrack === true,
 				cid: socketUser
 			}, 
 			socketWriteCall
@@ -159,6 +160,8 @@ var runningViewInit = function(meta){
 		right: initPosition.canvasRight + 'px'
 		
 	});
+	
+	runningWindow.innerCanvas = canvas;
 	
 	//runningWindow.open();
 	

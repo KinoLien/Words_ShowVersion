@@ -169,15 +169,15 @@ var serialInputViewInit = function(){
 	});
 	*/
 	
-	var submitButton = Ti.UI.createButton({
+	var newSubmitButton = Ti.UI.createButton({
 		color: '#fff',
 		backgroundColor:'#ff3333',
 		//backgroundSelectedColor:'#3ff',	// that is not support IOS
 		// maybe use backgroundImage and backgroundSelectedImage instead
-		top: initPosition.gapUnitSize * 11 + 'px',
-		width: initPosition.gapUnitSize * 7.5 + 'px',
-		height: initPosition.gapUnitSize * 2 + 'px',
-		title:'加入連線',
+		top: initPosition.gapUnitSize * 10.8 + 'px',
+		width: initPosition.gapUnitSize * 7 + 'px',
+		height: initPosition.gapUnitSize * 1.8 + 'px',
+		title:'加入連線(新)',
 		borderRadius:3,
 		font:{
 			fontSize: initPosition.fontSize + 'px',
@@ -185,14 +185,14 @@ var serialInputViewInit = function(){
 		}
 	});
 	
-	var mulitTestButton = Ti.UI.createButton({
+	var oldSubmitButton = Ti.UI.createButton({
 		color: '#fff',
 		backgroundColor:'#ff3333',
 		opacity:0.5,
-		top: initPosition.gapUnitSize * 13.2 + 'px',
+		top: initPosition.gapUnitSize * 13 + 'px',
 		width: initPosition.gapUnitSize * 5 + 'px',
 		height: initPosition.gapUnitSize * 1.4 + 'px',
-		title:'多人Test',
+		title:'加入連線(舊)',
 		borderRadius:3,
 		font:{
 			fontSize: initPosition.fontSize * 0.8 + 'px',
@@ -285,7 +285,7 @@ var serialInputViewInit = function(){
 	});
 	
 	// serialField.getValue();
-	submitButton.addEventListener('click', function(){
+	newSubmitButton.addEventListener('click', function(){
 		// Cache the code to globel variable and turn to run window
 		testMode = false;
 		serialMaskLabel.statusText = "連線中";
@@ -298,14 +298,14 @@ var serialInputViewInit = function(){
 		socketUser = serialField.getValue();
 		socketIpAddress = ipField.getValue();
 		
-		var wsIpAddress = socketIpAddress + ":" + railsPortNumber + "/websocket?client_id=" + socketUser;
+		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "?_rtUserId=" + socketUser;
 		
 		//socketPortNumber = parseInt(portField.getValue());
 		
 		triggerObj.user_id = socketUser;
 		// open socket to server
 		
-		socketObj = new WebSocketRails(wsIpAddress);
+		socketObj = new WebSocketNodeJS("http://"+wsIpAddress);
 		
 		socketObj.on_open = function(e){
 			//Ti.API.info('Socket opened');
@@ -341,7 +341,7 @@ var serialInputViewInit = function(){
 		}, 4500);
 	});
 	
-	mulitTestButton.addEventListener('click', function(){
+	oldSubmitButton.addEventListener('click', function(){
 		// Cache the code to globel variable and turn to run window
 		testMode = false;
 		serialMaskLabel.statusText = "連線中";
@@ -354,14 +354,15 @@ var serialInputViewInit = function(){
 		socketUser = serialField.getValue();
 		socketIpAddress = ipField.getValue();
 		
-		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "?_rtUserId=" + socketUser;
+		var wsIpAddress = socketIpAddress + ":" + railsPortNumber + "/websocket?client_id=" + socketUser;
 		
 		//socketPortNumber = parseInt(portField.getValue());
 		
 		triggerObj.user_id = socketUser;
 		// open socket to server
 		
-		socketObj = new WebSocketNodeJS("http://"+wsIpAddress);
+		socketObj = new WebSocketRails(wsIpAddress);
+		
 		socketObj.on_open = function(e){
 			//Ti.API.info('Socket opened');
 			getGameInfoRequest({
@@ -445,11 +446,11 @@ var serialInputViewInit = function(){
 	
 	
 	// backgroundSelectedColor is not support IOS, so use this way instead
-	submitButton.addEventListener('touchstart', function(){
-		submitButton.backgroundColor = '#ff003f';
+	newSubmitButton.addEventListener('touchstart', function(){
+		newSubmitButton.backgroundColor = '#ff003f';
 	});
-	submitButton.addEventListener('touchend', function(){
-		submitButton.backgroundColor = '#ff3333';
+	newSubmitButton.addEventListener('touchend', function(){
+		newSubmitButton.backgroundColor = '#ff3333';
 	});
 	serialInputWindow.addEventListener('androidback', function(e){
 		e.cancelBubble = true;
@@ -460,8 +461,8 @@ var serialInputViewInit = function(){
 	serialInputWindow.add(ipLabel);
 	serialInputWindow.add(ipField);
 	//serialInputWindow.add(portField);
-	serialInputWindow.add(submitButton);
-	serialInputWindow.add(mulitTestButton);
+	serialInputWindow.add(newSubmitButton);
+	serialInputWindow.add(oldSubmitButton);
 	serialInputWindow.add(testRegionLabel);
 	serialInputWindow.add(testButton);
 	serialInputWindow.add(wrongTestButton);
