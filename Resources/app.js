@@ -69,6 +69,7 @@ var isFunction = function(v){
 
 // App windows and objects
 var currentWindow = null;
+var currentWindowOpenCallback = null;
 var currentMask = null;
 var inputView = null;
 //var runView = null;
@@ -144,6 +145,8 @@ var clearConnectionInfo = function(clearSocket){
 	
 	if(currentWindow){
 		currentWindow.countDownLabel.stopCountDown();
+		currentWindow.activity.removeEventListener("pause", pauseEventHandler);
+		currentWindow.removeEventListener("open", currentWindowOpenCallback);
 		currentWindow.close();
 		currentWindow = null;
 	}
@@ -300,7 +303,7 @@ var prepareStage = function(stage){
 			});
 			currentWindow.refreshCountAfterStop = toRefresh;
 			currentWindow.passedMessage = passedMsg;
-			currentWindow.addEventListener('open', function(){
+			currentWindowOpenCallback = function(){
 				currentWindow.activity.actionBar.hide();
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
@@ -313,7 +316,8 @@ var prepareStage = function(stage){
 				currentMask.hide();
 				currentMask = currentWindow.maskView;
 				currentWindow.arrangeLayout(Ti.UI.PORTRAIT);
-			});
+			};
+			currentWindow.addEventListener('open', currentWindowOpenCallback);
 			currentWindow.open();
 			break;
 		case "B2":
@@ -322,7 +326,7 @@ var prepareStage = function(stage){
 				hasSecond: hasSecond
 			});
 			currentWindow.refreshCountAfterStop = toRefresh;
-			currentWindow.addEventListener('open', function(){
+			currentWindowOpenCallback = function(){
 				currentWindow.activity.actionBar.hide();
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
@@ -335,7 +339,8 @@ var prepareStage = function(stage){
 				currentMask.hide();
 				currentMask = currentWindow.maskView;
 				currentWindow.arrangeLayout(Ti.UI.PORTRAIT);
-			});
+			};
+			currentWindow.addEventListener('open', currentWindowOpenCallback);
 			currentWindow.open();
 			break;
 		case "B3":
@@ -343,7 +348,7 @@ var prepareStage = function(stage){
 				hasSecond: hasSecond
 			});
 			currentWindow.refreshCountAfterStop = toRefresh;
-			currentWindow.addEventListener('open', function(e){
+			currentWindowOpenCallback = function(e){
 				currentWindow.activity.actionBar.hide();
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
@@ -363,7 +368,8 @@ var prepareStage = function(stage){
 				currentMask.hide();
 				currentMask = currentWindow.maskView;
 				currentWindow.arrangeLayout(Ti.UI.LANDSCAPE_LEFT);
-			});
+			};
+			currentWindow.addEventListener('open', currentWindowOpenCallback);
 			currentWindow.open();
 			break;
 		default:
@@ -373,9 +379,6 @@ var prepareStage = function(stage){
 };
 
 var deprecateStage = function(stageName){
-	if(currentWindow){
-		currentWindow.activity.removeEventListener("pause", pauseEventHandler);	
-	}
 	switch (stageName){
 		case "A1":
 		case "A2":
