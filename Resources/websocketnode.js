@@ -27,20 +27,20 @@ NodeJS JavaScript Client
 				        message : '與伺服器連線中斷！',
 				        buttonNames : ['確定']
 				    });
-				 
-					disMsg.addEventListener('click', (function(){
-						var scope = this;
-						return function(e) {
-					        if(e.index == 0) {
-					    		setTimeout((function(){
-					    			var s = this;
-					    			return function(){
-					    				if(s.disconnectHandler) s.disconnectHandler();
-					    			};
-					    		}).call(scope),10);
-					        }
-					    };
-					}).call(this));
+// 				 
+					// disMsg.addEventListener('click', (function(){
+						// var scope = this;
+						// return function(e) {
+					        // if(e.index == 0) {
+					    		// setTimeout((function(){
+					    			// var s = this;
+					    			// return function(){
+					    				// if(s.disconnectHandler) s.disconnectHandler();
+					    			// };
+					    		// }).call(scope),10);
+					        // }
+					    // };
+					// }).call(this));
 				    disMsg.show();
 		    	}
 			}
@@ -65,6 +65,12 @@ NodeJS JavaScript Client
 		})(this);
 		
 		this.socket.on('connect', connectHandler);
+		this.socket.on('disconnect', (function(scope){
+			return function(){
+				scope.state = 'disconnected';
+				scope.disconnectHandler();
+			};
+		})(this));;
 
 		return this;
 	};

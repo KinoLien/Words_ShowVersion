@@ -135,17 +135,11 @@ var START_EVENT = 'start';
 var STOP_EVENT = 'stop';
 
 var clearConnectionInfo = function(clearSocket){
-	if(clearSocket !== false && socketObj){
-		if(socketObj.state != 'disconnected'){
-			socketObj.disconnect();	
-		}
-		socketObj = null;
-		gameInfo = false;	
-	}
-	
 	if(currentWindow){
 		currentWindow.countDownLabel.stopCountDown();
-		currentWindow.activity.removeEventListener("pause", pauseEventHandler);
+		if(currentWindow.activity && currentWindow.activity.removeEventListener){
+			currentWindow.activity.removeEventListener("pause", pauseEventHandler);	
+		}
 		currentWindow.removeEventListener("open", currentWindowOpenCallback);
 		currentWindow.close();
 		currentWindow = null;
@@ -153,6 +147,13 @@ var clearConnectionInfo = function(clearSocket){
 	if(currentMask){
 		//currentMask.hide();
 		currentMask = inputView.maskView;
+	}
+	if(clearSocket !== false && socketObj){
+		if(socketObj.state != 'disconnected'){
+			socketObj.disconnect();	
+		}
+		socketObj = null;
+		gameInfo = false;	
 	}
 	
 	watingTimeOut = null;
