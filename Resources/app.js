@@ -92,7 +92,7 @@ var socketPortNumber = '5001';
 var railsPortNumber = '3000';
 var preWindowStack = [];
 var triggerObj = {};
-var stampFilter = 16;
+var stampFilter = 20;
 var canvasProtocol = {
 	width: 500,
 	lineWidth: 10,
