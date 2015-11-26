@@ -608,7 +608,7 @@ var onCanvasTouchMove = function(e){
 };
 
 
-var onCanvasTouchCancel = function(e){ isDrawing = false;
+var onCanvasTouchCancel = function(e){ isDrawing = false; e.source.prestamp = 0;
 	var pc = e.source.pointCache;
 	if(pc && pc.length > 0){
 		idiomsCanvasPointArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1].push(pc.slice(0));

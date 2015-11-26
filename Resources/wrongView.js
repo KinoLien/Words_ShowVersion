@@ -272,14 +272,14 @@ var wrongPrepareCanvasView = function(initPosition, img){
 			}
 		}
 	});
-	res.addEventListener('touchend', function(e){ isDrawing = false;
+	res.addEventListener('touchend', function(e){ isDrawing = false; e.source.prestamp = 0;
 		var pc = e.source.pointCache;
 		if(pc && pc.length > 0){
 			wrongCanvasPointArray[wrongCurrentRow - 1][wrongCurrentCol - 1].push(pc.slice(0));
 			e.source.pointCache = null;
 		}
 	});
-	res.addEventListener('touchcancel', function(e){ isDrawing = false;
+	res.addEventListener('touchcancel', function(e){ isDrawing = false; e.source.prestamp = 0;
 		var pc = e.source.pointCache;
 		if(pc && pc.length > 0){
 			wrongCanvasPointArray[wrongCurrentRow - 1][wrongCurrentCol - 1].push(pc.slice(0));

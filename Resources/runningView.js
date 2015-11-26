@@ -404,11 +404,13 @@ var runningViewInit = function(meta){
 			}
 		}
 	});
-	canvas.addEventListener('touchend', function(){
+	canvas.addEventListener('touchend', function(e){
 		isDrawing = false;
+		e.source.prestamp = 0;
 	});
-	canvas.addEventListener('touchcancel', function(){
+	canvas.addEventListener('touchcancel', function(e){
 		isDrawing = false;
+		e.source.prestamp = 0;
 	});
 	
 	runningWindow.addEventListener('androidback', function(e){
