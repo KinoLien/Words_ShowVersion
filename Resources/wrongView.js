@@ -142,7 +142,7 @@ var wrongPrepareShortCanvasView = function(canvasInfo){
 		v.lineCap = canvasProtocol.lineCap;
 	});
 	
-	res.addEventListener('singletap', (function(view){
+	res.addEventListener('click', (function(view){
 		return function(e){
 			var canvas = e.source;
 			var row = canvas.rowIndex;
@@ -349,14 +349,14 @@ var wrongPrepareDrawingView = function(initPosition){
 	
 	var cview = wrongPrepareCanvasView(initPosition);
 	
-	maskView.addEventListener('singletap', function(e){
+	maskView.addEventListener('click', function(e){
 		wrongDrawingView.hide();
 		//var cview = wrongCanvasPointArray[wrongCurrentRow - 1][wrongCurrentCol - 1];
 		wrongTriggerDeviceAction('stop');
 		cview.clear();
 	});
 	
-	wrongConfirmButton.addEventListener('singletap', function(e){
+	wrongConfirmButton.addEventListener('click', function(e){
 		wrongDrawingView.hide();
 		//var cview = wrongCanvasPointArray[wrongCurrentRow - 1][wrongCurrentCol - 1];
 		wrongTriggerDeviceAction('stop');
@@ -378,7 +378,7 @@ var wrongPrepareDrawingView = function(initPosition){
 		cview.clear();
 	});
 	
-	wrongClearButton.addEventListener('singletap', function(e){
+	wrongClearButton.addEventListener('click', function(e){
 		var rowIndex = wrongCurrentRow - 1;
 		var colIndex = wrongCurrentCol - 1;
 		

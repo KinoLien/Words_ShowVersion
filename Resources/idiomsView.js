@@ -650,7 +650,7 @@ var idiomsPrepareShortCanvasView = function(canvasInfo){
 		v.lineCap = canvasProtocol.lineCap;
 	});
 	
-	res.addEventListener('singletap', (function(view, block){
+	res.addEventListener('click', (function(view, block){
 		return function(e){
 			var canvas = e.source;
 			var row = canvas.rowIndex;
@@ -751,21 +751,21 @@ var idiomsPrepareDrawingView = function(initPosition){
 	
 	var cview = idiomsPrepareCanvasView(initPosition);
 	
-	maskView.addEventListener('singletap', function(e){
+	maskView.addEventListener('click', function(e){
 		idiomsDrawingView.hide();
 		//var cview = idiomsCanvasPointArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1];
 		idiomsTriggerDeviceAction('stop');
 		cview.clear();
 	});
 	
-	idiomsCancelButton.addEventListener('singletap', function(e){
+	idiomsCancelButton.addEventListener('click', function(e){
 		idiomsDrawingView.hide();
 		//var cview = idiomsCanvasPointArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1];
 		idiomsTriggerDeviceAction('stop');
 		cview.clear();
 	});
 	
-	idiomsConfirmButton.addEventListener('singletap', function(e){
+	idiomsConfirmButton.addEventListener('click', function(e){
 		idiomsDrawingView.hide();
 		//var cview = idiomsCanvasPointArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1];
 		idiomsTriggerDeviceAction('stop');
@@ -783,7 +783,7 @@ var idiomsPrepareDrawingView = function(initPosition){
 		cview.clear();
 	});
 	
-	idiomsClearButton.addEventListener('singletap', function(e){
+	idiomsClearButton.addEventListener('click', function(e){
 		var rowIndex = idiomsCurrentRow - 1;
 		var colIndex = idiomsCurrentCol - 1;
 		
