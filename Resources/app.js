@@ -92,7 +92,7 @@ var socketPortNumber = '5001';
 var railsPortNumber = '3000';
 var preWindowStack = [];
 var triggerObj = {};
-var stampFilter = 20;
+var stampFilter = 19;
 var canvasProtocol = {
 	width: 500,
 	lineWidth: 10,
@@ -117,6 +117,7 @@ var idiomsOriginToShortScale = 1;
 // idioms game event
 var IDIOMS_EVENT = 'idioms';
 var WRONG_EVENT = 'B2';
+var MIX_EVENT = 'mix';
 // normal events
 var TOUCH_DOWN_EVENT = 'down_location';
 var TOUCH_MOVE_EVENT = 'move_location';
@@ -141,6 +142,7 @@ var clearConnectionInfo = function(clearSocket){
 			currentWindow.activity.removeEventListener("pause", pauseEventHandler);	
 		}
 		currentWindow.removeEventListener("open", currentWindowOpenCallback);
+		currentWindowOpenCallback = null;
 		currentWindow.close();
 		currentWindow = null;
 	}
@@ -175,10 +177,21 @@ var clearConnectionInfo = function(clearSocket){
 	wrongShortCanvasArray = null;
 	wrongCanvasPointArray = null;
 	
+	// mix
+	mixCurrentRow = 1;
+	mixCurrentCol = 1;
+	mixOccupyArray = null;
+	// mixDirtyList = null;
+	mixShortCanvasArray = null;
+	mixCanvasPointArray = null;
+	
 	// scales
 	wrongShortToProtocolScale = 1;
 	wrongOriginToProtocolScale = 1;
 	wrongOriginToShortScale = 1;
+	mixShortToProtocolScale = 1;
+	mixOriginToProtocolScale = 1;
+	mixOriginToShortScale = 1;
 	idiomsShortToProtocolScale = 1;
 	idiomsOriginToProtocolScale = 1;
 	idiomsOriginToShortScale = 1;
@@ -262,7 +275,7 @@ var parseGameInfo = function(info, sourceUrl){
 	};
 };
 
-var prepareStage = function(stage){
+var prepareStage = function(stage, second, common, locking){
 	var toRefresh = false;
 	var hasSecond = true;
 	var passedMsg = "已傳送資料，等待後台判斷是否正確。";
@@ -286,6 +299,11 @@ var prepareStage = function(stage){
 			break;
 		case "B2":
 			hasSecond = false;
+			break;
+		case "mix":
+			hasSecond = second && second > 0;
+			toRefresh = common && common == 1 && locking == 0;
+			toLocked = locking && locking == 1;
 			break;
 		case "B3":
 			toRefresh = false;
@@ -335,6 +353,30 @@ var prepareStage = function(stage){
 					socketObj.bind(ACTION_EVENT, wrongActionCallback());
 					socketObj.bind(CLEAR_EVENT, wrongClearCallback());
 					//socketObj.bind(CONTINUE_WRITE_EVENT, runningContinueWriteCallback());
+					socketObj.trigger(DEVICE_READY_EVENT, triggerObj);	
+				}
+				currentMask.hide();
+				currentMask = currentWindow.maskView;
+				currentWindow.arrangeLayout(Ti.UI.PORTRAIT);
+			};
+			currentWindow.addEventListener('open', currentWindowOpenCallback);
+			currentWindow.open();
+			break;
+		case "mix":
+			currentWindow = mixViewInit({
+				imageUrl: gameInfo? gameInfo.imageUrl : "exampleHead.png",
+				hasSecond: hasSecond
+			});
+			currentWindow.refreshCountAfterStop = toRefresh;
+			currentWindowOpenCallback = function(){
+				currentWindow.activity.actionBar.hide();
+				currentWindow.activity.addEventListener("pause", pauseEventHandler);
+				clearInterval(inputView.maskInterval);
+				if(socketObj){
+					socketObj.bind(ACTION_EVENT, mixActionCallback());
+					socketObj.bind(CLEAR_EVENT, mixClearCallback());
+					socketObj.bind(CONTINUE_WRITE_EVENT, mixContinueWriteCallback());
+					socketObj.bind(SEND_TEXT_EVENT, mixSendTextCallback()); 
 					socketObj.trigger(DEVICE_READY_EVENT, triggerObj);	
 				}
 				currentMask.hide();
@@ -397,6 +439,14 @@ var deprecateStage = function(stageName){
 				socketObj.unbind(ACTION_EVENT);
 				socketObj.unbind(CLEAR_EVENT);
 				//socketObj.unbind(CONTINUE_WRITE_EVENT);
+			}
+			break;
+		case "mix":
+			if(socketObj){
+				socketObj.unbind(ACTION_EVENT);
+				socketObj.unbind(CLEAR_EVENT);
+				socketObj.unbind(CONTINUE_WRITE_EVENT);
+				socketObj.unbind(SEND_TEXT_EVENT); 
 			}
 			break;
 		case "B3":
@@ -486,6 +536,7 @@ Ti.include('serialInputView.js');
 Ti.include('idiomsView.js');
 Ti.include('runningView.js');
 Ti.include('wrongView.js');
+Ti.include('mixView.js');
 
 inputView = serialInputViewInit();
 inputView.addEventListener('open', function(e){

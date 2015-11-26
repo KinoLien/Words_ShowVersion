@@ -85,6 +85,7 @@ var getCurrentPositionLayout = function(orientationMode){
 	obj.highlightBorder = obj.blockHeight / highlightBorderScale / 2;
 	
 	obj.wrongCanvasWidth = (obj.shortSideWidth - obj.padding * 4) / 3;
+	obj.mixCanvasWidth = (obj.shortSideWidth - obj.padding * 4) / 3;
 	
 	return obj;
 };

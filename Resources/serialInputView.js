@@ -22,12 +22,17 @@ var resetCallback = function(data){
 						deprecateStage(old);
 						currentMask.label.text = "關卡切換中...";
 						currentMask.show();
-						prepareStage(info.stage);
+						prepareStage(info.stage, info.second, info.common, info.locking);
+						
+						// "second":"30","common":"1","locking":"1"
 						
 						//inputView.maskInterval = setInterval(genMaskInterval(serialMaskLabel), 300);
 						//deprecateStage(old);
 						//prepareStage(info.stage);
 					}else{
+						if(currentWindow.countDownLabel){
+							currentWindow.countDownLabel.setVisible(!!info.second);
+						}
 						currentWindow.refreshAll();
 						//currentMask.hide();
 					}
@@ -317,7 +322,8 @@ var serialInputViewInit = function(){
 				successHandler: function(info){
 					clearTimeout(watingTimeOut);
 					serialMaskLabel.statusText = "正在開啟";
-					prepareStage(info.stage);
+					// prepareStage(info.stage);
+					prepareStage(info.stage, info.second, info.common, info.locking);
 					serialMaskLabel.statusText = "";
 				},
 				errorHandler: function(info){
