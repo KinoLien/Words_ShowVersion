@@ -93,7 +93,11 @@ NodeJS JavaScript Client
 	
 	WebSocketNodeJS.prototype.unbind = function(name){
 		if(this.socket){
-			this.socket.removeAllListeners(name);
+			if (0 == arguments.length) {
+				this.socket.removeAllListeners();
+			}else{
+				this.socket.removeAllListeners(name);
+			}
 		}
 		return this;
 	};

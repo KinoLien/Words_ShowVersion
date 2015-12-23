@@ -333,7 +333,7 @@ var serialInputViewInit = function(){
 					if(currentMask) currentMask.hide();
 				}
 			});
-			socketObj.bind(RESET_EVENT, resetCallback);
+			//socketObj.bind(RESET_EVENT, resetCallback);
 		};
 		socketObj.disconnectHandler = function(){
 			clearConnectionInfo();
@@ -389,7 +389,7 @@ var serialInputViewInit = function(){
 					if(currentMask) currentMask.hide();
 				}
 			});
-			socketObj.bind(RESET_EVENT, resetCallback);
+			//socketObj.bind(RESET_EVENT, resetCallback);
 		};
 		socketObj.disconnectHandler = function(){
 			clearConnectionInfo();
