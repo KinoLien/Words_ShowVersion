@@ -126,18 +126,18 @@ var mixTriggerDeviceAction = function(name){
 };
 
 var mixTriggerMoveBlock = function(){
-	// if(socketObj){
-		// socketObj.trigger(
-			// MIX_EVENT + "." + MOVE_BLOCK_EVENT,
-			// {
-				// user_id: socketUser,
-				// block:{
-					// row: mixCurrentRow,
-					// column: mixCurrentCol
-				// }
-			// }
-		// );
-	// }
+	if(socketObj){
+		socketObj.trigger(
+			MIX_EVENT + "." + MOVE_BLOCK_EVENT,
+			{
+				user_id: socketUser,
+				block:{
+					row: mixCurrentRow,
+					column: mixCurrentCol
+				}
+			}
+		);
+	}
 };
 
 var mixPrepareShortCanvasView = function(canvasInfo){
@@ -389,18 +389,18 @@ var mixPrepareDrawingView = function(initPosition){
 		//Ti.API.info("In DrawView: " + JSON.stringify(canvasPoint));
 		//alert(JSON.stringify(canvasPoint));
 		
-		// if(socketObj && canvasPoint.length > 0){
-			// socketObj.trigger(
-				// MIX_EVENT + "." + SUBMIT_EVENT,
-				// {
-					// user_id: socketUser,
-					// block:{
-						// row: mixCurrentRow,
-						// column: mixCurrentCol
-					// }
-				// }
-			// );
-		// }
+		if(socketObj && canvasPoint.length > 0){
+			socketObj.trigger(
+				MIX_EVENT + "." + SUBMIT_EVENT,
+				{
+					user_id: socketUser,
+					block:{
+						row: mixCurrentRow,
+						column: mixCurrentCol
+					}
+				}
+			);
+		}
 		
 		cview.clear();
 	});
