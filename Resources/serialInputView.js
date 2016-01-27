@@ -31,7 +31,7 @@ var resetCallback = function(data){
 						//prepareStage(info.stage);
 					}else{
 						if(currentWindow.countDownLabel){
-							currentWindow.countDownLabel.setVisible(!!info.second);
+							currentWindow.countDownLabel.setVisible(!isSynVersion && !!info.second);
 						}
 						currentWindow.refreshAll();
 						//currentMask.hide();
@@ -182,7 +182,7 @@ var serialInputViewInit = function(){
 		top: initPosition.gapUnitSize * 10.8 + 'px',
 		width: initPosition.gapUnitSize * 7 + 'px',
 		height: initPosition.gapUnitSize * 1.8 + 'px',
-		title:'加入連線(新)',
+		title:'加入連線',
 		borderRadius:3,
 		font:{
 			fontSize: initPosition.fontSize + 'px',
@@ -195,12 +195,15 @@ var serialInputViewInit = function(){
 		backgroundColor:'#ff3333',
 		opacity:0.5,
 		top: initPosition.gapUnitSize * 13 + 'px',
-		width: initPosition.gapUnitSize * 5 + 'px',
-		height: initPosition.gapUnitSize * 1.4 + 'px',
-		title:'加入連線(舊)',
+		// width: initPosition.gapUnitSize * 5 + 'px',
+		width: initPosition.gapUnitSize * 9 + 'px',
+		// height: initPosition.gapUnitSize * 1.4 + 'px',
+		height: initPosition.gapUnitSize * 1.8 + 'px',
+		title:'加入連線(同步版)',
 		borderRadius:3,
 		font:{
-			fontSize: initPosition.fontSize * 0.8 + 'px',
+			// fontSize: initPosition.fontSize * 0.8 + 'px',
+			fontSize: initPosition.fontSize + 'px',
 			fontFamily: 'Helvetica Neue'
 		}
 	});
@@ -294,7 +297,7 @@ var serialInputViewInit = function(){
 		// Cache the code to globel variable and turn to run window
 		testMode = false;
 		serialMaskLabel.statusText = "連線中";
-		
+		isSynVersion = false;
 		serialInputWindow.maskInterval = setInterval(genMaskInterval(serialMaskLabel), 300);
 		
 		serialMaskView.show();
@@ -349,6 +352,27 @@ var serialInputViewInit = function(){
 	
 	oldSubmitButton.addEventListener('click', function(){
 		// Cache the code to globel variable and turn to run window
+		// testMode = false;
+		// serialMaskLabel.statusText = "連線中";
+		
+		// serialInputWindow.maskInterval = setInterval(genMaskInterval(serialMaskLabel), 300);
+		
+		// serialMaskView.show();
+		
+		// // cache information
+		// socketUser = serialField.getValue();
+		// socketIpAddress = ipField.getValue();
+		
+		// var wsIpAddress = socketIpAddress + ":" + railsPortNumber + "/websocket?client_id=" + socketUser;
+		
+		// //socketPortNumber = parseInt(portField.getValue());
+		
+		// triggerObj.user_id = socketUser;
+		// // open socket to server
+		
+		// socketObj = new WebSocketRails(wsIpAddress);
+
+
 		testMode = false;
 		serialMaskLabel.statusText = "連線中";
 		
@@ -359,15 +383,15 @@ var serialInputViewInit = function(){
 		// cache information
 		socketUser = serialField.getValue();
 		socketIpAddress = ipField.getValue();
-		
-		var wsIpAddress = socketIpAddress + ":" + railsPortNumber + "/websocket?client_id=" + socketUser;
+		isSynVersion = true;
+		var wsIpAddress = socketIpAddress + ":" + socketPortNumber + "?_rtUserId=" + socketUser;
 		
 		//socketPortNumber = parseInt(portField.getValue());
 		
 		triggerObj.user_id = socketUser;
 		// open socket to server
 		
-		socketObj = new WebSocketRails(wsIpAddress);
+		socketObj = new WebSocketNodeJS("http://"+wsIpAddress);
 		
 		socketObj.on_open = function(e){
 			//Ti.API.info('Socket opened');
@@ -379,7 +403,8 @@ var serialInputViewInit = function(){
 				successHandler: function(info){
 					clearTimeout(watingTimeOut);
 					serialMaskLabel.statusText = "正在開啟";
-					prepareStage(info.stage);
+					// prepareStage(info.stage);
+					prepareStage(info.stage, info.second, info.common, info.locking);
 					serialMaskLabel.statusText = "";
 				},
 				errorHandler: function(info){

@@ -113,6 +113,8 @@ var idiomsShortToProtocolScale = 1;
 var idiomsOriginToProtocolScale = 1;
 var idiomsOriginToShortScale = 1;
 
+var isSynVersion = false;
+
 // constants
 // idioms game event
 var IDIOMS_EVENT = 'idioms';

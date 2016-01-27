@@ -37,16 +37,29 @@ var getCurrentPositionLayout = function(orientationMode){
 	obj.backgroundRight = isPortrait? 0 : (obj.squareWidth + obj.padding); 
 	obj.backgroundTop = isPortrait? 0 : (obj.padding + obj.photoHeight);
 	
-	
-	obj.canvasBottom = obj.padding;
-	obj.canvasRight = obj.padding;
+	if(!isSynVersion){
+		obj.canvasBottom = obj.padding;
+		obj.canvasRight = obj.padding;
+	}else{
+		obj.canvasBottom = obj.padding;
+		obj.canvasRight = (obj.longSideWidth - obj.squareWidth) / 2;
+	}
+
 	obj.photoLeft = obj.padding;
 	obj.photoTop = obj.padding;
 	
-	obj.submitBtnBottom = isPortrait? (obj.squareWidth + obj.padding * 2) : obj.padding; 
-	obj.submitBtnRight = isPortrait? obj.padding : (obj.squareWidth + obj.padding * 2);
-	obj.clearBtnBottom = obj.submitBtnBottom;
-	obj.clearBtnRight = isPortrait? (obj.buttonWidth + obj.padding * 2) : (obj.buttonWidth + obj.squareWidth + obj.padding * 3);
+	if(!isSynVersion){
+		obj.submitBtnBottom = isPortrait? (obj.squareWidth + obj.padding * 2) : obj.padding; 
+		obj.submitBtnRight = isPortrait? obj.padding : (obj.squareWidth + obj.padding * 2);
+		obj.clearBtnBottom = obj.submitBtnBottom;
+		obj.clearBtnRight = isPortrait? (obj.buttonWidth + obj.padding * 2) : (obj.buttonWidth + obj.squareWidth + obj.padding * 3);	
+	}else{
+		obj.submitBtnBottom = obj.buttonHeight + obj.padding * 2; 
+		obj.submitBtnRight = obj.padding;
+		obj.clearBtnBottom = obj.padding;
+		obj.clearBtnRight = obj.padding;	
+	}
+	
 	
 	// count down label
 	obj.countWidth = obj.photoWidth * 2 / 3;

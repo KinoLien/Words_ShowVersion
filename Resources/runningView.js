@@ -25,18 +25,30 @@ var runningActionCallback = function(){
 	//var childs = scope.getChildren();
 	//var maskView = childs[childs.length-1];
 	var maskView = scope.maskView;
+	var submitBtn = scope.children[4];
+	var clearBtn = scope.children[5];
 	return function(data){
 		if(data.action == START_EVENT){
 			runningDeviceAction('start');
 			maskView.hide();
 			// maybe auto clear
 			scope.countDownLabel.doCountDown();
+			if(isSynVersion){
+				submitBtn.setBackgroundColor('#22ee22');
+				clearBtn.setBackgroundColor('#ee2222');
+			}
 		}else if(data.action == STOP_EVENT){
 			var label = maskView.label;
 			isDrawing = false;
 			runningDeviceAction('stop');
-			label.text = data.showText || (scope.refreshCountAfterStop? "時間到" : "");
-			label.text += "\n" + waitForServer;
+			if(isSynVersion){
+				label.text = "";
+				submitBtn.setBackgroundColor('#f0f0f0');
+				clearBtn.setBackgroundColor('#f0f0f0');
+			}else{
+				label.text = data.showText || (scope.refreshCountAfterStop? "時間到" : "");
+				label.text += "\n" + waitForServer;
+			}
 			maskView.show();
 			scope.countDownLabel.stopCountDown(scope.refreshCountAfterStop);
 		}
@@ -59,10 +71,16 @@ var runningClearCallback = function(){
 var runningContinueWriteCallback = function(){
 	var scope = currentWindow;
 	var mask = scope.maskView;
+	var submitBtn = scope.children[4];
+	var clearBtn = scope.children[5];
 	return function(data){
 		if(socketUser == data.user_id){
 			mask.hide();
 			runningDeviceAction('start');
+			if(isSynVersion){
+				submitBtn.setBackgroundColor('#22ee22');
+				clearBtn.setBackgroundColor('#ee2222');
+			}
 		}
 	};
 };
@@ -76,15 +94,15 @@ var runningViewInit = function(meta){
 		backgroundColor:'#fff',
 		fullscreen:true,
 		orientationModes:[
+			(isSynVersion? Ti.UI.LANDSCAPE_RIGHT : Ti.UI.PORTRAIT)
 			//Ti.UI.LANDSCAPE_LEFT,
 			//Ti.UI.LANDSCAPE_RIGHT,
-			Ti.UI.PORTRAIT
 		]
 	});
 	
 	var runningMaskView = Titanium.UI.createView({
 		backgroundColor:'#e0e0e0',
-		opacity:0.7,
+		opacity:isSynVersion? 0.0 : 0.7,
 		//zIndex:1,
 		visible:!testMode,
 		width: initPosition.screenWidth + 'px',
@@ -93,7 +111,7 @@ var runningViewInit = function(meta){
 	});
 	var runningMaskLabel = Titanium.UI.createLabel({
 		color:'#000',
-		text:waitForServer,
+		text: isSynVersion? "" : waitForServer,
 		//textAlign:'center',
 		font:{
 			fontSize: initPosition.fontSize + 'px',
@@ -131,11 +149,13 @@ var runningViewInit = function(meta){
 	runningMaskView.label = runningMaskLabel;
 	runningWindow.maskView = runningMaskView;
 	
+	
 	/* Create Background Image */
 	var backgroundView = Ti.UI.createImageView({
 		image: "bk.png",
 		right: 0 + 'px',
 		top: 0 + 'px',
+		visible: !isSynVersion,
 		width: initPosition.backgroundWidth + 'px',
 		//height: initPosition.backgroundHeight + 'px',
 		height: 'auto'
@@ -145,13 +165,16 @@ var runningViewInit = function(meta){
 		//borderWidth: 2,
 		//borderColor: "#ff0000"
 	});
+		
+	
+	
 	
 	/* Create a canvas */
 	var canvas = Canvas.createCanvasView({
 		//backgroundColor: "#d0d0d0",
 		//borderWidth: 2,
 		//borderColor: "#ff0000",
-		backgroundImage: 'block-524.png',
+		backgroundImage: isSynVersion? 'rice-block.png':'block-524.png',
 		//zIndex: 1,
 		
 		width: initPosition.squareWidth + 'px',
@@ -165,9 +188,11 @@ var runningViewInit = function(meta){
 	
 	//runningWindow.open();
 	
+	
 	// User image
 	var imageView = Ti.UI.createImageView({
 		//image: "exampleHead.png",
+		visible: !isSynVersion,
 		image: meta.imageUrl || "",
 		left: initPosition.photoLeft + 'px',
 		top: initPosition.photoTop + 'px',
@@ -184,6 +209,7 @@ var runningViewInit = function(meta){
 	
 	var userNumberLabel = Titanium.UI.createLabel({
 		color:'#000',
+		visible: !isSynVersion,
 		text: socketUser.toString(),
 		textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 		shadowOffset: {x:5, y:5},
@@ -203,18 +229,20 @@ var runningViewInit = function(meta){
 		}
 	});
 	
+	
+	
 	var submitButton = Ti.UI.createButton({
 		color: '#ffffff',
-		backgroundColor:'#22ee22',
+		backgroundColor: isSynVersion? '#f0f0f0':'#22ee22',
 		//backgroundSelectedColor:'#3ff',	// that is not support IOS
 		// maybe use backgroundImage and backgroundSelectedImage instead
-		
+		// visible: !isSynVersion,
 		bottom: initPosition.submitBtnBottom + 'px',
 		right: initPosition.submitBtnRight + 'px',
 		width: initPosition.buttonWidth + 'px',
 		height: initPosition.buttonHeight + 'px',
 		
-		title:'確定',
+		title:isSynVersion? '确定':'確定',
 		font:{
 			fontSize: initPosition.fontSize + 'px',
 			fontFamily: 'Helvetica Neue',
@@ -224,8 +252,8 @@ var runningViewInit = function(meta){
 	
 	var clearButton = Ti.UI.createButton({
 		color: '#ffffff',
-		backgroundColor:'#ee2222',
-		
+		backgroundColor:isSynVersion? '#f0f0f0':'#ee2222',
+		// visible: !isSynVersion,
 		bottom: initPosition.clearBtnBottom + 'px',
 		right: initPosition.clearBtnRight + 'px',
 		width: initPosition.buttonWidth + 'px',
@@ -245,7 +273,7 @@ var runningViewInit = function(meta){
 		text: s + "秒",
 		originSecond: s,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-		visible: meta.hasSecond !== false,
+		visible: !isSynVersion && meta.hasSecond !== false,
 		
 		right: initPosition.countRight + 'px',
 		bottom: initPosition.countBottom + 'px',
@@ -303,7 +331,13 @@ var runningViewInit = function(meta){
 	
 	submitButton.addEventListener('click', function(){
 		var msg = runningWindow.passedMessage || "";
-		runningMaskLabel.text = msg || ("已傳送資料" + '\n' + waitForServer);
+		if(isSynVersion){
+			runningMaskLabel.text = "";
+			submitButton.setBackgroundColor('#f0f0f0');
+			clearButton.setBackgroundColor('#f0f0f0');
+		}else{
+			runningMaskLabel.text = msg || ("已傳送資料" + '\n' + waitForServer);
+		}
 		if(testMode){
 			runningWindow.countDownLabel.stopCountDown();
 		}
@@ -406,7 +440,20 @@ var runningViewInit = function(meta){
 	});
 	canvas.addEventListener('touchend', function(e){
 		isDrawing = false;
-		e.source.prestamp = 0;
+		var obj = e.source;
+		obj.prestamp = 0;
+		obj.lineTo(e.x, e.y);
+		obj.stroke();
+		socketObj.trigger(
+			TOUCH_MOVE_EVENT,
+			{
+				user_id: socketUser,
+				x: e.x * rootScale,
+				y: e.y * rootScale,
+				stamp: (new Date()).getTime()
+			},
+			socketWriteCall
+		);
 	});
 	canvas.addEventListener('touchcancel', function(e){
 		isDrawing = false;
@@ -452,17 +499,13 @@ var runningViewInit = function(meta){
 		backgroundView.setTop(currentPosition.backgroundTop + 'px');
 	});
 	*/
-	
 	runningWindow.add(backgroundView);
-	
 	runningWindow.add(canvas);
-	
 	runningWindow.add(imageView);
 	runningWindow.add(userNumberLabel);
 	runningWindow.add(submitButton);
 	runningWindow.add(clearButton);
 	runningWindow.add(countDownLabel);
-	
 	runningWindow.add(runningMaskView);
 	
 	runningWindow.arrangeLayout = function(orientation){
@@ -471,11 +514,11 @@ var runningViewInit = function(meta){
 		submitButton.setRight(currentPosition.submitBtnRight + 'px');
 		clearButton.setBottom(currentPosition.clearBtnBottom + 'px');
 		clearButton.setRight(currentPosition.clearBtnRight + 'px');
-		runningMaskView.setWidth(currentPosition.screenWidth + 'px');
-		runningMaskView.setHeight(currentPosition.screenHeight + 'px');
 		backgroundView.setWidth(currentPosition.backgroundWidth + 'px');
 		backgroundView.setRight(currentPosition.backgroundRight + 'px');
-		backgroundView.setTop(currentPosition.backgroundTop + 'px');
+		backgroundView.setTop(currentPosition.backgroundTop + 'px');	
+		runningMaskView.setWidth(currentPosition.screenWidth + 'px');
+		runningMaskView.setHeight(currentPosition.screenHeight + 'px');
 		countDownLabel.setRight(currentPosition.countRight + 'px');
 		countDownLabel.setBottom(currentPosition.countBottom + 'px');
 	};
@@ -486,7 +529,7 @@ var runningViewInit = function(meta){
 		isDrawing = false;
 		canvas.clear();
 		self.countDownLabel.reloadCountDownSecond();
-		runningMaskView.label.text = waitForServer;
+		runningMaskView.label.text = (isSynVersion? "" : waitForServer);
 		runningMaskView.show();
 		if(socketObj){
 			socketObj.trigger(DEVICE_READY_EVENT, triggerObj);
