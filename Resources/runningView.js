@@ -34,8 +34,8 @@ var runningActionCallback = function(){
 			// maybe auto clear
 			scope.countDownLabel.doCountDown();
 			if(isSynVersion){
-				submitBtn.setBackgroundColor('#22ee22');
-				clearBtn.setBackgroundColor('#ee2222');
+				submitBtn.setOpacity(1);
+				clearBtn.setOpacity(1);
 			}
 		}else if(data.action == STOP_EVENT){
 			var label = maskView.label;
@@ -43,8 +43,8 @@ var runningActionCallback = function(){
 			runningDeviceAction('stop');
 			if(isSynVersion){
 				label.text = "";
-				submitBtn.setBackgroundColor('#f0f0f0');
-				clearBtn.setBackgroundColor('#f0f0f0');
+				submitBtn.setOpacity(0.3);
+				clearBtn.setOpacity(0.3);
 			}else{
 				label.text = data.showText || (scope.refreshCountAfterStop? "時間到" : "");
 				label.text += "\n" + waitForServer;
@@ -78,8 +78,8 @@ var runningContinueWriteCallback = function(){
 			mask.hide();
 			runningDeviceAction('start');
 			if(isSynVersion){
-				submitBtn.setBackgroundColor('#22ee22');
-				clearBtn.setBackgroundColor('#ee2222');
+				submitBtn.setOpacity(1);
+				clearBtn.setOpacity(1);
 			}
 		}
 	};
@@ -92,6 +92,7 @@ var runningViewInit = function(meta){
 		title: '一字千金 - Drawing',
 		navBarHidden:true,
 		backgroundColor:'#fff',
+		backgroundImage: isSynVersion? 'sync-back.png' : undefined,
 		fullscreen:true,
 		orientationModes:[
 			(isSynVersion? Ti.UI.LANDSCAPE_RIGHT : Ti.UI.PORTRAIT)
@@ -174,7 +175,7 @@ var runningViewInit = function(meta){
 		//backgroundColor: "#d0d0d0",
 		//borderWidth: 2,
 		//borderColor: "#ff0000",
-		backgroundImage: isSynVersion? 'rice-block.png':'block-524.png',
+		backgroundImage: isSynVersion? undefined:'block-524.png',
 		//zIndex: 1,
 		
 		width: initPosition.squareWidth + 'px',
@@ -232,8 +233,14 @@ var runningViewInit = function(meta){
 	
 	
 	var submitButton = Ti.UI.createButton({
-		color: '#ffffff',
-		backgroundColor: isSynVersion? '#f0f0f0':'#22ee22',
+		// color: isSynVersion? '#5f4741':'#ffffff',
+		color: isSynVersion? '#5f4741':'#ffffff',
+		backgroundColor: isSynVersion? '#f8d973':'#22ee22',
+		borderColor: isSynVersion? '#d6b751':undefined,
+		borderRadius: isSynVersion? 5:undefined,
+		borderWidth : isSynVersion? 3:undefined,
+		opacity: isSynVersion? 0.3:undefined,
+
 		//backgroundSelectedColor:'#3ff',	// that is not support IOS
 		// maybe use backgroundImage and backgroundSelectedImage instead
 		// visible: !isSynVersion,
@@ -251,8 +258,12 @@ var runningViewInit = function(meta){
 	});
 	
 	var clearButton = Ti.UI.createButton({
-		color: '#ffffff',
-		backgroundColor:isSynVersion? '#f0f0f0':'#ee2222',
+		color: isSynVersion? '#5f4741':'#ffffff',
+		backgroundColor:isSynVersion? '#f8d973':'#ee2222',
+		borderColor: isSynVersion? '#d6b751':undefined,
+		borderRadius: isSynVersion? 5:undefined,
+		borderWidth : isSynVersion? 4:undefined,
+		opacity: isSynVersion? 0.3:undefined,
 		// visible: !isSynVersion,
 		bottom: initPosition.clearBtnBottom + 'px',
 		right: initPosition.clearBtnRight + 'px',
@@ -333,8 +344,8 @@ var runningViewInit = function(meta){
 		var msg = runningWindow.passedMessage || "";
 		if(isSynVersion){
 			runningMaskLabel.text = "";
-			submitButton.setBackgroundColor('#f0f0f0');
-			clearButton.setBackgroundColor('#f0f0f0');
+			submitButton.setOpacity(0.3);
+			clearButton.setOpacity(0.3);
 		}else{
 			runningMaskLabel.text = msg || ("已傳送資料" + '\n' + waitForServer);
 		}
@@ -373,7 +384,7 @@ var runningViewInit = function(meta){
 	canvas.addEventListener('load', function(e){
 		var obj = e.source;
 		obj.lineWidth = canvasProtocol.lineWidth / rootScale;
-    	obj.strokeStyle = canvasProtocol.lineColor;
+    	obj.strokeStyle = isSynVersion? '#ececec' : canvasProtocol.lineColor;
     	obj.lineCap = canvasProtocol.lineCap;
     	obj.prestamp = 0;
 	});
