@@ -96,7 +96,7 @@ var idiomsSendTextCallback = function(){
 				innerShortCanvas.beginPath();
 				//innerShortCanvas.textAlign = "center";
 				innerShortCanvas.textStyle = "bold";
-				innerShortCanvas.fillStyle = "#2222ee";
+				innerShortCanvas.fillStyle = data.color || "#ececec";
 				innerShortCanvas.textSize = w * 13 / 15;
 				innerShortCanvas.fillText(text, w / 15, w * 12 / 15);
 			}	
@@ -126,7 +126,7 @@ var idiomsTouchDownCallback = function(){
 			var innerShortCanvas = idiomsShortCanvasArray[rowIndex][colIndex];
 			if(innerShortCanvas){
 				//innerShortCanvas.strokeStyle = "#ff0000";
-				innerShortCanvas.strokeStyle = "#0000ff";
+				// innerShortCanvas.strokeStyle = "#0000ff";
 				innerShortCanvas.beginPath();
 				innerShortCanvas.drawPoint(x / idiomsShortToProtocolScale, y / idiomsShortToProtocolScale);
 				innerShortCanvas.moveTo(x / idiomsShortToProtocolScale, y / idiomsShortToProtocolScale);
@@ -151,7 +151,7 @@ var idiomsTouchMoveCallback = function(){
 			var innerShortCanvas = idiomsShortCanvasArray[rowIndex][colIndex];
 			if(innerShortCanvas){
 				//innerShortCanvas.strokeStyle = "#ff0000";
-				innerShortCanvas.strokeStyle = "#0000ff";
+				// innerShortCanvas.strokeStyle = "#0000ff";
 				innerShortCanvas.lineTo(x / idiomsShortToProtocolScale, y / idiomsShortToProtocolScale);
 				innerShortCanvas.moveTo(x / idiomsShortToProtocolScale, y / idiomsShortToProtocolScale);
 				innerShortCanvas.stroke();
@@ -178,16 +178,27 @@ var idiomsClearCallback = function(){
 		}
 	};
 };
+var idiomsChangeColorCallback = function(){
+	var scope = currentWindow;
+	return function(data){
+		if(socketUser == data.user_id){
+			if(scope){
+				scope.currentDrawingColor = data.color;	
+			}
+		}
+	};
+};
 var idiomsMoveBlockCallback = function(){
 	var scope = currentWindow;
 	return function(data){
 		if(socketUser != data.user_id && data.block){
-			if(currentWindow){
-				var backgroundView = currentWindow.children[0];
+			if(scope){
+				var ri = data.block.row - 1;
+				var ci = data.block.column - 1;
+				var backgroundView = scope.children[0];
 				var highlightView = backgroundView.children[1];
-				
-				highlightView.moveTo(data.block.row-1, data.block.column-1);
-					
+				idiomsShortCanvasArray[ri][ci].strokeStyle = data.color || scope.defaultDrawingColor;
+				highlightView.moveTo(ri, ci);
 			}
 		}
 	};
@@ -203,7 +214,7 @@ var idiomsRewriteCallback = function(){
 			var innerShortCanvas = idiomsShortCanvasArray[row][col];
 			var inkArray = data.ink;
 			idiomsDirtyList[block.row + '-' + block.column] = (inkArray && inkArray.length);
-			innerShortCanvas.strokeStyle = "#0000ff";
+			innerShortCanvas.strokeStyle = data.color || scope.defaultDrawingColor;
 			drawPointToCanvas(inkArray, innerShortCanvas, idiomsShortToProtocolScale);
 			// for(var i = 0, len = inkArray.length; i < len ; i++){
 				// var ink = inkArray[i];
@@ -230,15 +241,18 @@ var idiomsRewriteCallback = function(){
 
 var idiomsTriggerMoveBlock = function(){
 	if(socketObj){
+		var passColor = currentWindow.currentDrawingColor || currentWindow.defaultDrawingColor; 
 		socketObj.trigger(
 			IDIOMS_EVENT + "." + MOVE_BLOCK_EVENT,
 			triggerObj.combine({ 
 				block:{
 					row: idiomsCurrentRow,
 					column: idiomsCurrentCol
-				} 
+				},
+				color: passColor
 			})
 		);
+		idiomsShortCanvasArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1].strokeStyle = passColor;
 	}
 };
 
@@ -386,7 +400,7 @@ var secondViewInit = function(initPosition){
 	var s = testMode? 60 : gameInfo.second; 
 	
 	var secondLabel = Titanium.UI.createLabel({
-		color:'#ff0000',
+		color:'#00ffff',
 		text: s + '秒',
 		originSecond: s,
 		textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
@@ -555,7 +569,7 @@ var onCanvasTouchStart = function(e){
 	//*/
 	var innerShortCanvas = idiomsShortCanvasArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1];
 	if(innerShortCanvas){
-		innerShortCanvas.strokeStyle = "#0000ff";
+		// innerShortCanvas.strokeStyle = "#0000ff";
 		innerShortCanvas.beginPath();
 		innerShortCanvas.drawPoint(e.x * idiomsOriginToShortScale, e.y * idiomsOriginToShortScale);
 		innerShortCanvas.moveTo(e.x * idiomsOriginToShortScale, e.y * idiomsOriginToShortScale);
@@ -599,7 +613,7 @@ var onCanvasTouchMove = function(e){
 		/*/
 		var innerShortCanvas = idiomsShortCanvasArray[idiomsCurrentRow - 1][idiomsCurrentCol - 1];
 		if(innerShortCanvas){
-			innerShortCanvas.strokeStyle = "#0000ff";
+			// innerShortCanvas.strokeStyle = "#0000ff";
 			innerShortCanvas.lineTo(e.x * idiomsOriginToShortScale, e.y * idiomsOriginToShortScale);
 			innerShortCanvas.moveTo(e.x * idiomsOriginToShortScale, e.y * idiomsOriginToShortScale);
 			innerShortCanvas.stroke();
@@ -648,6 +662,7 @@ var idiomsPrepareShortCanvasView = function(canvasInfo){
 		var v = e.source;
 		v.lineWidth = canvasProtocol.lineWidth / idiomsShortToProtocolScale * 1.5;
 		v.lineCap = canvasProtocol.lineCap;
+		v.strokeStyle = canvasInfo.strokeColor; // as default
 	});
 	
 	res.addEventListener('click', (function(view, block){
@@ -693,7 +708,7 @@ var idiomsPrepareDrawingView = function(initPosition){
 	var maskView = Ti.UI.createView({
 		width: initPosition.longSideWidth + 'px',
 		height: initPosition.shortSideWidth + 'px',
-		backgroundColor:'#e0e0e0',
+		backgroundColor:'#1f1f1f',
 		opacity:0.7
 	});
 	
@@ -824,7 +839,7 @@ var idiomsViewInit = function(meta){
 	var idiomsWindow = Titanium.UI.createWindow({
 		//title: '一字千金 - Drawing',
 		navBarHidden:true,
-		backgroundColor:'#fff',
+		backgroundColor:'#000',
 		fullscreen:true,
 		orientationModes:[
 			Ti.UI.LANDSCAPE_LEFT
@@ -898,7 +913,7 @@ var idiomsViewInit = function(meta){
 	backgroundView.add(highlightView2);
 	
 	var idiomsMaskView = Titanium.UI.createView({
-		backgroundColor:'#e0e0e0',
+		backgroundColor:'#1f1f1f',
 		opacity:0.7,
 		visible:false,
 		width: initPosition.longSideWidth + 'px',
@@ -906,7 +921,7 @@ var idiomsViewInit = function(meta){
 		left:0, top:0
 	});
 	var idiomsMaskLabel = Titanium.UI.createLabel({
-		color:'#000',
+		color:'#fff',
 		text: '連線中',
 		statusText: '連線中',
 		//textAlign:'center',
@@ -918,6 +933,7 @@ var idiomsViewInit = function(meta){
 	idiomsMaskView.add(idiomsMaskLabel);
 	idiomsMaskView.label = idiomsMaskLabel;
 	idiomsWindow.maskView = idiomsMaskView;
+	idiomsWindow.defaultDrawingColor = "#ececec";
 	
 	idiomsShortToProtocolScale = canvasProtocol.width / initPosition.highlightWidth;
 	idiomsOriginToProtocolScale = canvasProtocol.width / initPosition.squareWidth;
@@ -944,6 +960,7 @@ var idiomsViewInit = function(meta){
 				left: initPosition.highlightWidth * col + initPosition.highlightInitLeft,
 				top: initPosition.highlightHeight * row + initPosition.highlightInitTop,
 				relatedView: drawingView,
+				strokeColor: idiomsWindow.defaultDrawingColor,
 				rowIndex: row,
 				colIndex: col,
 				blockView: highlightView
@@ -962,7 +979,7 @@ var idiomsViewInit = function(meta){
 	}
 	
 	var textLabelView = Titanium.UI.createLabel({
-		color:'#000',
+		color:'#fff',
 		text: (testMode)? '測試模式':waitForServer,
 		bottom:0,
 		//textAlign:'center',
@@ -973,11 +990,11 @@ var idiomsViewInit = function(meta){
 	});
 	
 	var userNumberLabel = Titanium.UI.createLabel({
-		color:'#000',
+		color:'#fff',
 		text: socketUser.toString(),
 		textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 		
-  		backgroundColor: '#eee',
+  		backgroundColor: '#111',
   		
 		left: initPosition.photoLeft + 'px',
 		top: initPosition.photoTop + 'px',

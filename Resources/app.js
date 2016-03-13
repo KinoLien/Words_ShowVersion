@@ -131,6 +131,7 @@ var RESET_EVENT = 'reset'; // Not test yet
 var CONTINUE_WRITE_EVENT = 'continue_write'; // **
 var REWRITE_EVENT = 'rewrite';
 var MOVE_BLOCK_EVENT = 'move_block';
+var CHANG_COLOR_EVENT = 'change_color';
 var SEND_TEXT_EVENT = 'send_text';
 var END_ROUND_EVENT = 'end_round';
 // Action events
@@ -154,6 +155,7 @@ var clearConnectionInfo = function(clearSocket){
 	}
 	if(clearSocket !== false && socketObj){
 		if(socketObj.state != 'disconnected'){
+			socketObj.unbind();
 			socketObj.disconnect();	
 		}
 		socketObj = null;
@@ -329,6 +331,7 @@ var prepareStage = function(stage, second, common, locking){
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
+					socketObj.bind(RESET_EVENT, resetCallback);
 					socketObj.bind(ACTION_EVENT, runningActionCallback());
 					socketObj.bind(CLEAR_EVENT, runningClearCallback());
 					socketObj.bind(CONTINUE_WRITE_EVENT, runningContinueWriteCallback());
@@ -352,6 +355,7 @@ var prepareStage = function(stage, second, common, locking){
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
+					socketObj.bind(RESET_EVENT, resetCallback);
 					socketObj.bind(ACTION_EVENT, wrongActionCallback());
 					socketObj.bind(CLEAR_EVENT, wrongClearCallback());
 					//socketObj.bind(CONTINUE_WRITE_EVENT, runningContinueWriteCallback());
@@ -375,6 +379,7 @@ var prepareStage = function(stage, second, common, locking){
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
+					socketObj.bind(RESET_EVENT, resetCallback);
 					socketObj.bind(ACTION_EVENT, mixActionCallback());
 					socketObj.bind(CLEAR_EVENT, mixClearCallback());
 					socketObj.bind(CONTINUE_WRITE_EVENT, mixContinueWriteCallback());
@@ -398,6 +403,7 @@ var prepareStage = function(stage, second, common, locking){
 				currentWindow.activity.addEventListener("pause", pauseEventHandler);
 				clearInterval(inputView.maskInterval);
 				if(socketObj){
+					socketObj.bind(RESET_EVENT, resetCallback);
 					socketObj.bind(ACTION_EVENT, idiomsActionCallback());
 					socketObj.bind(TOUCH_DOWN_EVENT, idiomsTouchDownCallback());
 					socketObj.bind(TOUCH_MOVE_EVENT, idiomsTouchMoveCallback());
@@ -405,6 +411,7 @@ var prepareStage = function(stage, second, common, locking){
 					//idiomsSendTextCallback
 					socketObj.bind(SEND_TEXT_EVENT, idiomsSendTextCallback()); 
 					socketObj.bind(MOVE_BLOCK_EVENT, idiomsMoveBlockCallback());
+					socketObj.bind(CHANG_COLOR_EVENT, idiomsChangeColorCallback());
 					socketObj.bind(REWRITE_EVENT, idiomsRewriteCallback());
 					socketObj.bind(CONTINUE_WRITE_EVENT, idiomsContinueWriteCallback());
 					//socketObj.bind(IDIOMS_EVENT + "." + END_ROUND_EVENT, idiomsSubmitCallback.call(idiomsView));
@@ -434,12 +441,14 @@ var deprecateStage = function(stageName){
 				socketObj.unbind(ACTION_EVENT);
 				socketObj.unbind(CLEAR_EVENT);
 				socketObj.unbind(CONTINUE_WRITE_EVENT);
+				socketObj.unbind(RESET_EVENT);
 			}
 			break;
 		case "B2":
 			if(socketObj){
 				socketObj.unbind(ACTION_EVENT);
 				socketObj.unbind(CLEAR_EVENT);
+				socketObj.unbind(RESET_EVENT);
 				//socketObj.unbind(CONTINUE_WRITE_EVENT);
 			}
 			break;
@@ -449,6 +458,7 @@ var deprecateStage = function(stageName){
 				socketObj.unbind(CLEAR_EVENT);
 				socketObj.unbind(CONTINUE_WRITE_EVENT);
 				socketObj.unbind(SEND_TEXT_EVENT); 
+				socketObj.unbind(RESET_EVENT);
 			}
 			break;
 		case "B3":
@@ -458,9 +468,11 @@ var deprecateStage = function(stageName){
 				socketObj.unbind(TOUCH_MOVE_EVENT);
 				socketObj.unbind(CLEAR_EVENT);
 				socketObj.unbind(MOVE_BLOCK_EVENT);
+				socketObj.unbind(CHANG_COLOR_EVENT);
 				socketObj.unbind(SEND_TEXT_EVENT);
 				socketObj.unbind(REWRITE_EVENT);
 				socketObj.unbind(CONTINUE_WRITE_EVENT);
+				socketObj.unbind(RESET_EVENT);
 			}
 			break;
 		default:
