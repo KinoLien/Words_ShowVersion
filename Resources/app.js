@@ -291,12 +291,12 @@ var parseGameInfo = function(info, sourceUrl){
 
 var prepareStage = function(meta){
 	var stage, second, common, locking;
-	if ( typeof(meta) == "object" ){
+	if ( typeof meta == "object" ){
 		stage = meta.stage;
 		second = meta.second;
 		common = meta.common;
 		locking = meta.locking;
-	}else if( typeof(meta) == "string" ){
+	}else if( typeof meta == "string" ){
 		stage = meta;
 		second = common = locking = undefined;
 	}

@@ -1,6 +1,6 @@
 
 var getCurrentPositionLayout = function(orientationMode, metadata){
-	if ( typeof(orientationMode) == "object" ){
+	if ( typeof orientationMode == "object" ){
 		metadata = orientationMode;
 		orientationMode = metadata.orientation || undefined;
 	}
