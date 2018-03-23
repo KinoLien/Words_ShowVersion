@@ -18,11 +18,11 @@ var resetCallback = function(data){
 			successHandler: (function(old){
 				return function(info){
 					clearTimeout(watingTimeOut);
-					if(old != info.stage){
+					if(old != info.stage || info.stage == "group"){
 						deprecateStage(old);
 						currentMask.label.text = "關卡切換中...";
 						currentMask.show();
-						prepareStage(info.stage, info.second, info.common, info.locking);
+						prepareStage(info);
 						
 						// "second":"30","common":"1","locking":"1"
 						
@@ -326,7 +326,7 @@ var serialInputViewInit = function(){
 					clearTimeout(watingTimeOut);
 					serialMaskLabel.statusText = "正在開啟";
 					// prepareStage(info.stage);
-					prepareStage(info.stage, info.second, info.common, info.locking);
+					prepareStage(info);
 					serialMaskLabel.statusText = "";
 				},
 				errorHandler: function(info){
@@ -404,7 +404,7 @@ var serialInputViewInit = function(){
 					clearTimeout(watingTimeOut);
 					serialMaskLabel.statusText = "正在開啟";
 					// prepareStage(info.stage);
-					prepareStage(info.stage, info.second, info.common, info.locking);
+					prepareStage(info);
 					serialMaskLabel.statusText = "";
 				},
 				errorHandler: function(info){

@@ -1,5 +1,10 @@
 
-var getCurrentPositionLayout = function(orientationMode){
+var getCurrentPositionLayout = function(orientationMode, metadata){
+	if ( typeof(orientationMode) == "object" ){
+		metadata = orientationMode;
+		orientationMode = metadata.orientation || undefined;
+	}
+
 	var modes = appValidModes;
 	
 	var obj = {
@@ -100,6 +105,11 @@ var getCurrentPositionLayout = function(orientationMode){
 	obj.wrongCanvasWidth = (obj.shortSideWidth - obj.padding * 4) / 3;
 	obj.mixCanvasWidth = (obj.shortSideWidth - obj.padding * 4) / 3;
 	
+	if(metadata){
+		metadata.blockCount = metadata.blockCount || 3;
+		obj.groupCanvasWidth = (obj.shortSideWidth - obj.padding * (metadata.blockCount + 1) ) / metadata.blockCount;
+	}
+
 	return obj;
 };
 

@@ -120,6 +120,7 @@ var isSynVersion = false;
 var IDIOMS_EVENT = 'idioms';
 var WRONG_EVENT = 'B2';
 var MIX_EVENT = 'mix';
+var GROUP_EVENT = 'group';
 // normal events
 var TOUCH_DOWN_EVENT = 'down_location';
 var TOUCH_MOVE_EVENT = 'move_location';
@@ -188,6 +189,11 @@ var clearConnectionInfo = function(clearSocket){
 	// mixDirtyList = null;
 	mixShortCanvasArray = null;
 	mixCanvasPointArray = null;
+
+	// group
+	groupCurrentBlock = 1;
+	groupShortCanvasArray = null;
+	groupCanvasPointArray = null;
 	
 	// scales
 	wrongShortToProtocolScale = 1;
@@ -199,6 +205,9 @@ var clearConnectionInfo = function(clearSocket){
 	idiomsShortToProtocolScale = 1;
 	idiomsOriginToProtocolScale = 1;
 	idiomsOriginToShortScale = 1;
+	groupShortToProtocolScale = 1;
+	groupOriginToProtocolScale = 1;
+	groupOriginToShortScale = 1;
 };
 
 var getGameInfoRequest = function(handlers){
@@ -275,16 +284,29 @@ var parseGameInfo = function(info, sourceUrl){
 		name: info.visitor.name,
 		second: parseInt(info.second),
 		stage: info.stage,
-		imageUrl: imageUrl
+		imageUrl: imageUrl,
+		blocks: parseInt(info.blocks || 3)
 	};
 };
 
-var prepareStage = function(stage, second, common, locking){
+var prepareStage = function(meta){
+	var stage, second, common, locking;
+	if ( typeof(meta) == "object" ){
+		stage = meta.stage;
+		second = meta.second;
+		common = meta.common;
+		locking = meta.locking;
+	}else if( typeof(meta) == "string" ){
+		stage = meta;
+		second = common = locking = undefined;
+	}
+
 	var toRefresh = false;
 	var hasSecond = true;
 	var passedMsg = "已傳送資料，等待後台判斷是否正確。";
 	switch (stage){
 		case "A1":
+		case "group":
 			toRefresh = false;
 			hasSecond = true;
 			break;
@@ -393,6 +415,31 @@ var prepareStage = function(stage, second, common, locking){
 			currentWindow.addEventListener('open', currentWindowOpenCallback);
 			currentWindow.open();
 			break;
+		case "group":
+			currentWindow = groupViewInit({
+				imageUrl: gameInfo.imageUrl,
+				hasSecond: hasSecond,
+				blockCount: gameInfo.blocks
+			});
+			currentWindow.refreshCountAfterStop = toRefresh;
+			currentWindowOpenCallback = function(){
+				currentWindow.activity.actionBar.hide();
+				currentWindow.activity.addEventListener("pause", pauseEventHandler);
+				clearInterval(inputView.maskInterval);
+				if(socketObj){
+					socketObj.bind(RESET_EVENT, resetCallback);
+					socketObj.bind(ACTION_EVENT, groupActionCallback());
+					socketObj.bind(CLEAR_EVENT, groupClearCallback());
+					socketObj.bind(CONTINUE_WRITE_EVENT, groupContinueWriteCallback());
+					socketObj.trigger(DEVICE_READY_EVENT, triggerObj);	
+				}
+				currentMask.hide();
+				currentMask = currentWindow.maskView;
+				currentWindow.arrangeLayout(Ti.UI.PORTRAIT);
+			};
+			currentWindow.addEventListener('open', currentWindowOpenCallback);
+			currentWindow.open();
+			break;
 		case "B3":
 			currentWindow = idiomsViewInit({
 				hasSecond: hasSecond
@@ -458,6 +505,14 @@ var deprecateStage = function(stageName){
 				socketObj.unbind(CLEAR_EVENT);
 				socketObj.unbind(CONTINUE_WRITE_EVENT);
 				socketObj.unbind(SEND_TEXT_EVENT); 
+				socketObj.unbind(RESET_EVENT);
+			}
+			break;
+		case "group":
+			if(socketObj){
+				socketObj.unbind(ACTION_EVENT);
+				socketObj.unbind(CLEAR_EVENT);
+				socketObj.unbind(CONTINUE_WRITE_EVENT);
 				socketObj.unbind(RESET_EVENT);
 			}
 			break;
@@ -551,6 +606,7 @@ Ti.include('idiomsView.js');
 Ti.include('runningView.js');
 Ti.include('wrongView.js');
 Ti.include('mixView.js');
+Ti.include('groupView.js');
 
 inputView = serialInputViewInit();
 inputView.addEventListener('open', function(e){
