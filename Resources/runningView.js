@@ -455,16 +455,18 @@ var runningViewInit = function(meta){
 		obj.prestamp = 0;
 		obj.lineTo(e.x, e.y);
 		obj.stroke();
-		socketObj.trigger(
-			TOUCH_MOVE_EVENT,
-			{
-				user_id: socketUser,
-				x: e.x * rootScale,
-				y: e.y * rootScale,
-				stamp: (new Date()).getTime()
-			},
-			socketWriteCall
-		);
+		if(socketObj){
+			socketObj.trigger(
+				TOUCH_MOVE_EVENT,
+				{
+					user_id: socketUser,
+					x: e.x * rootScale,
+					y: e.y * rootScale,
+					stamp: (new Date()).getTime()
+				},
+				socketWriteCall
+			);
+		}
 	});
 	canvas.addEventListener('touchcancel', function(e){
 		isDrawing = false;
