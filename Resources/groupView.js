@@ -477,7 +477,7 @@ var groupViewInit = function(meta){
 	var drawingView = groupPrepareDrawingView(initPosition);
 	// Create a block view
 	var blockView = groupBlockViewInit(initPosition, {
-		relateBigView: drawingView
+		relateBigView: drawingView,
 		blockCount: meta.blockCount
 	});
 	
