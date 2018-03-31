@@ -486,7 +486,7 @@ var groupViewInit = function(meta){
 		backgroundColor:'#ee7722',
 		
 		top: (initPosition.photoHeight + initPosition.padding * 2) + 'px',
-		right: initPosition.padding + 'px',
+		right: initPosition.padding + initPosition.buttonWidth + 'px',
 		width: initPosition.buttonWidth + 'px',
 		height: initPosition.buttonHeight + 'px',
 		
