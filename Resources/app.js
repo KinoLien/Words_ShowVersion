@@ -308,7 +308,7 @@ var prepareStage = function(meta){
 		case "A1":
 		case "group":
 			toRefresh = false;
-			hasSecond = true;
+			hasSecond = second && second > 0;
 			break;
 		case "A2":
 			toRefresh = false;
